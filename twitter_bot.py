@@ -1,6 +1,7 @@
 from credentials import *
 import tweepy
 import time, datetime
+import random
 
 ################### API AUTHENTICATION ###################
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -11,7 +12,6 @@ api = tweepy.API(auth)
 # SETS THE FILES TO A VARIABLE
 FILE_NAME = 'last_seen.txt'
 quote_file = 'quotes_to_tweet.txt'
-menu_option = 0
 
 # GETS THE ID OF THE LAST PULLED TWEET
 def retrieve_last_seen_id(file_name):
@@ -53,26 +53,37 @@ def reply_to_tweets():
 
 # POSTING TWEETS FROM A FILE METHOD
 def posting_tweets():
-    print("posting today's tweet")
+    print("\nfinding today's tweet...\n")
     # READS FROM A FILE
     f_quotes = open(quote_file, 'r')
     # READ LINES - ONE BY ONE - ASSIGNED TO A VARIABLE
     file_lines = f_quotes.readlines()
-    f_quotes.close()
-    # LOOP TO ITERATE OVER LINES FROM A FILE
-    for line in file_lines:
+    line_list = []
+    for i in range(0, len(file_lines)-1):
         try:
-
-            print('posting...\n' + line)
-            api.update_status(line)
-            time.sleep(5)
+            x = file_lines[i]
+            z = len(x)
+            a = x[:z-1]
+            line_list.append(a)
+            line_list.append(file_lines[i+1])
+            random_line = random.choice(line_list)
+            print('tweet found! posting now... \n' + random_line)
+            #api.update_status(random_line)
+            f_quotes.close()
+            time.sleep(10)
         except tweepy.TweepError as e:
+            f_log = open('log.txt', 'w')
+            error_log = f_log.writelines()
             print(e.reason)
+            print('\n' + time.date() + '\n')
+            f_log.close()
+            print('\n Saved to Log.txt')
             time.sleep(2)
 
-def menu():
+
+
 
 
 while True:
     posting_tweets()
-    reply_to_tweets()
+    #reply_to_tweets()
