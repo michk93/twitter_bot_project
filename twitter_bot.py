@@ -31,7 +31,7 @@ def store_last_seen_id(last_seen_id, file_name):
     # 1371567807071195138
 # REPLY TO TWEETS METHOD
 def reply_to_tweets():
-    print('looking up tweets and replying to them...')
+    print('looking for mentions...')
     # POINTS A VARIABLE TO A METHOD TO GET THE LAST PULLED ID
     # AND ATTACHES THE FILE WITH STORED TWEET IDS
     last_seen_id = retrieve_last_seen_id(_lastMentionID)
@@ -43,13 +43,13 @@ def reply_to_tweets():
     # (OLD MENTION TOP, NEW MENTION BOTTOM)
     # STORES THE ID OF EACH POST INTERACTED WITH
     for mention in reversed(mentions):
-        print(str(mention.id) + ' - ' + mention.full_text)
+        print("\n" + str(mention.id) + ' - ' + mention.full_text)
         last_seen_id = mention.id
         store_last_seen_id(last_seen_id, _lastMentionID)
         if mention.full_text.lower():
             print('\na mention has been found!')
-            print('picking a response...\n\n')
-            print('responding in progres...\n \n')
+            print('picking a response...\n')
+            print('responding in progres...\n')
             api.update_status('@' + mention.user.screen_name + " " + random_line_picker(responses), mention.id)
             time.sleep(30)
 
