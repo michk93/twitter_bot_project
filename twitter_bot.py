@@ -10,8 +10,9 @@ api = tweepy.API(auth)
 ##########################################################
 
 # SETS THE FILES TO A VARIABLE
-FILE_NAME = 'last_seen.txt'
+_lastMentionID = 'last_seen.txt'
 quote_file = 'quotes_to_tweet.txt'
+responses = 'responses_to_mentions.txt'
 
 # GETS THE ID OF THE LAST PULLED TWEET
 def retrieve_last_seen_id(file_name):
@@ -33,7 +34,7 @@ def reply_to_tweets():
     print('looking up tweets and replying to them...')
     # POINTS A VARIABLE TO A METHOD TO GET THE LAST PULLED ID
     # AND ATTACHES THE FILE WITH STORED TWEET IDS
-    last_seen_id = retrieve_last_seen_id(FILE_NAME)
+    last_seen_id = retrieve_last_seen_id(_lastMentionID)
     # PULLS MENTIONS IGNORING ANYTHING BEFORE THE LAST SEEN ID
     mentions = api.mentions_timeline(
                     last_seen_id,
@@ -44,33 +45,38 @@ def reply_to_tweets():
     for mention in reversed(mentions):
         print(str(mention.id) + ' - ' + mention.full_text)
         last_seen_id = mention.id
-        store_last_seen_id(last_seen_id, FILE_NAME)
+        store_last_seen_id(last_seen_id, _lastMentionID)
         if mention.full_text.lower():
-            print('a mention has been found!')
+            print('\na mention has been found!')
+            print('picking a response...\n\n')
             print('responding in progres...\n \n')
-            api.update_status('@' + mention.user.screen_name + ' this is an automated response. Test has been successful', mention.id)
+            api.update_status('@' + mention.user.screen_name + " " + random_line_picker(responses), mention.id)
             time.sleep(30)
 
 # POSTING TWEETS FROM A FILE METHOD
 def posting_tweets():
     print("\nfinding today's tweet...\n")
-    # READS FROM A FILE
-    f_quotes = open(quote_file, 'r')
-    # READ LINES - ONE BY ONE - ASSIGNED TO A VARIABLE
-    file_lines = f_quotes.readlines()
-    line_list = []
-    for i in range(0, len(file_lines)-1):
+    random_line_picker(quote_file)
+    #api.update_status(quote_file)
+    time.sleep(900)
+
+# PICKS A RANDOM LINE FROM A FILE
+def random_line_picker(file_name):
+    print('fetching the line from a file... \n')
+    rand_read = open(file_name, 'r')
+    rand_line = rand_read.readlines()
+    _Listline = []
+    for i in range(0, len(rand_line)-1):
         try:
-            x = file_lines[i]
+            x = rand_line[i]
             z = len(x)
             a = x[:z-1]
-            line_list.append(a)
-            line_list.append(file_lines[i+1])
-            random_line = random.choice(line_list)
-            print('tweet found! posting now... \n' + random_line)
-            #api.update_status(random_line)
-            f_quotes.close()
-            time.sleep(10)
+            _Listline.append(a)
+            _Listline.append(rand_line[i+1])
+            picked_line = random.choice(_Listline)
+            print('line picked!\n' + picked_line)
+            rand_read.close()
+            return picked_line
         except tweepy.TweepError as e:
             f_log = open('log.txt', 'w')
             error_log = f_log.writelines()
@@ -82,8 +88,6 @@ def posting_tweets():
 
 
 
-
-
 while True:
-    posting_tweets()
-    #reply_to_tweets()
+    #posting_tweets()
+    reply_to_tweets()
